@@ -1,0 +1,32 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+start = "flask run"
+
+[packages]
+flask = "*"
+pymysql = "*"
+python-dotenv = "*"
+requests = "*"
+flask-cors = "*"
+bcrypt = "*"
+alembic = "*"
+mysqlclient = "*"
+pyjwt = "*"
+uwsgi = "*"
+marshmallow = "*"
+Flask-Migrate = "*"
+
+[dev-packages]
+flask-swagger-ui = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+pytest-flask = "*"
+ruff = "*"
+
+[requires]
+python_version = "3.12"

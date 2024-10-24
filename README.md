@@ -1,2 +1,3 @@
-# template_service
-Template repo for the service layer of a stack
+# stack_service
+
+Template repo for service in a stack.

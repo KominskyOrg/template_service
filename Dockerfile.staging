@@ -1,0 +1,69 @@
+# Stage 1: Builder
+FROM python:3.12-slim AS builder
+
+# Set the working directory
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  pkg-config \
+  default-libmysqlclient-dev \
+  build-essential \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install pipenv
+RUN pip install --no-cache-dir pipenv
+
+# Copy Pipfile and Pipfile.lock to leverage Docker cache
+COPY Pipfile Pipfile.lock ./
+
+# Install dependencies including staging packages
+RUN pipenv install --system --dev
+
+# Stage 2: Staging Runtime
+FROM python:3.12.2-slim AS staging
+
+# Set environment variables
+ENV FLASK_APP=app
+ENV FLASK_ENV=staging
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Set the working directory
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  curl \
+  libmariadb3 \
+  default-mysql-client \
+  netcat-openbsd \
+  && rm -rf /var/lib/apt/lists/*
+
+# Copy system site-packages from builder
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+
+# Copy Python binaries from builder (including Flask executable)
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy the application code
+COPY . .
+
+# Create a non-root user for security
+RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
+
+# Change ownership of the app directory
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
+
+# Expose the staging port
+EXPOSE 5001
+
+# Healthcheck (optional for staging)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:5001/api/stack/health || exit 1
+
+# Define the entrypoint script
+ENTRYPOINT ["/app/entrypoint/entrypoint.sh"]

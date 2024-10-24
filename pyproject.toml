@@ -1,0 +1,25 @@
+[tool.ruff]
+# Match Black's line length
+line-length = 88
+
+# Enforce PEP 8 and specific linting rules
+lint.select = ["C901", "S101", "F841", "T201", "B006", "UP001", "E401", "E722"]
+
+# Ignore rules that don't fit with Black's style
+lint.extend-ignore = ["E203"]
+
+# Set target Python version (matching Black's target version)
+target-version = "py312"
+
+# Exclude directories (same as Black/Flake8)
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+]
+
+# Per-file ignores
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["S101"]

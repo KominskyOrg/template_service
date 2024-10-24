@@ -1,0 +1,24 @@
+openapi: 3.0.0
+info:
+  title: Stack Service Swagger
+  version: 1.0.0
+  description: Template for Stack Service
+
+servers:
+  - url: http://localhost:5001/service/stack
+
+paths:
+  /health:
+    get:
+      summary: Health check for Auth Service
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK

@@ -1,0 +1,26 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - '**/*.py'
+      - 'Pipfile*'
+  pull_request:
+    branches:
+      - main
+      - staging
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - '**/*.py'
+      - 'Pipfile*'
+
+jobs:
+  test:
+    uses: KominskyOrg/kom_reusable_workflows/.github/workflows/ci_python.yml@v1.4
+    secrets: inherit

@@ -1,0 +1,16 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+  pull_request:
+    branches:
+      - main
+      - staging
+
+jobs:
+  build-and-deploy:
+    uses: KominskyOrg/kom_reusable_workflows/.github/workflows/eks_deployment.yml@v1.2
+    secrets: inherit
