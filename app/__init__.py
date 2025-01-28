@@ -1,5 +1,4 @@
-# app/__init__.py
-
+from kom_python_core.python_core.logging import LoggingConfig
 import logging
 from flask import Flask
 from flask_cors import CORS
@@ -7,6 +6,15 @@ from flask_migrate import Migrate
 from app.routes import stack_service_bp
 from app.config import get_config
 from app.database import init_db, db
+import os
+
+
+env = os.getenv("FLASK_ENV", "development")
+log_level = os.getenv("LOG_LEVEL", "INFO")
+logger_config = LoggingConfig(log_level=log_level, environment=env)
+logger_config.configure()
+
+logger = logging.get_logger(__name__)
 
 def create_app():
     app = Flask(__name__)
@@ -14,16 +22,15 @@ def create_app():
     # Enable CORS
     CORS(app)
 
-    logger = app.logger
+    # Configure Logging
+    logger.configure()
+    logger.set_log_level(log_level)
     logger.debug("Creating the Flask application.")
 
     # Load configuration
     config = get_config()
     app.config.from_object(config)
     logger.debug("Configuration loaded.")
-
-    # Set up detailed logging after configuration
-    setup_logging(app)
 
     # Initialize the database
     init_db(app)
@@ -42,39 +49,13 @@ def create_app():
 
     # Conditionally register Swagger UI in development environment
     if app.config.get("ENV") == "development":
-        register_swagger_ui(app, logger)
+        register_swagger_ui(app)
 
     logger.info("Flask application creation complete.")
     return app
 
-def setup_logging(app) -> None:
-    """Configures logging for the Flask application."""
-    # Remove default handlers to prevent duplicate logs
-    for handler in app.logger.handlers[:]:
-        app.logger.removeHandler(handler)
 
-    # Create a stream handler for console output
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.INFO)
-
-    # Define a detailed log format
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    stream_handler.setFormatter(formatter)
-
-    # Add the handler to the app's logger
-    app.logger.addHandler(stream_handler)
-    app.logger.setLevel(logging.INFO)
-
-    # Optionally, add file logging for production
-    if app.config.get("ENV") == "production":
-        file_handler = logging.FileHandler("app.log")
-        file_handler.setLevel(logging.INFO)
-        file_handler.setFormatter(formatter)
-        app.logger.addHandler(file_handler)
-
-def register_swagger_ui(app, logger) -> None:
+def register_swagger_ui(app) -> None:
     """Registers Swagger UI for API documentation in development environment."""
     try:
         from flask_swagger_ui import get_swaggerui_blueprint

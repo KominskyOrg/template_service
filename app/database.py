@@ -2,14 +2,14 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
-import logging
+from kom_python_core import Logger
 from contextlib import contextmanager
 
 # Initialize Flask-SQLAlchemy
 db = SQLAlchemy()
 
 # Get the logger
-logger = logging.getLogger(__name__)
+logger = Logger(__name__)
 
 
 def init_db(app) -> None:

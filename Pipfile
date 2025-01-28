@@ -19,6 +19,7 @@ pyjwt = "*"
 uwsgi = "*"
 marshmallow = "*"
 Flask-Migrate = "*"
+kom-python-core = "*"
 
 [dev-packages]
 flask-swagger-ui = "*"
